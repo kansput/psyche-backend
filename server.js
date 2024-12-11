@@ -4,7 +4,7 @@ const Hapi = require('@hapi/hapi');
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
 const testRoutes = require('./routes/testRoutes');
-const historyRoutes = require('./routes/historyRoutes');
+const { getTestHistory, saveTestHistory } = require('./routes/historyRoutes');
 
 const init = async () => {
     const server = Hapi.server({
@@ -15,10 +15,23 @@ const init = async () => {
     // Debugging: Cek apakah routes sudah benar
     console.log('Auth Routes:', authRoutes);
     console.log('Test Routes:', testRoutes);
-    console.log('History Routes:', historyRoutes);
+    console.log('History Routes:', { getTestHistory, saveTestHistory });
 
     // Register all routes
-    server.route([...authRoutes, ...testRoutes, ...historyRoutes]);
+    server.route([
+        ...authRoutes,
+        ...testRoutes,
+        {
+            method: 'GET',
+            path: '/history',
+            handler: getTestHistory
+        },
+        {
+            method: 'POST',
+            path: '/history',
+            handler: saveTestHistory
+        }
+    ]);
 
     await server.start();
     console.log(`Server running on ${server.info.uri}`);
